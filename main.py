@@ -10,25 +10,32 @@ def score(solution, data):
     total_requests = 0
 
     # form of request is as follows: (video, endpoint): num_of_requests
-    for request in data["video_ed_request"]:
-        video = int(request[0])
-        endpoint = int(request[1])
-        num_of_requests = int(data["video_ed_request"][request])
-        dc_latency = data["ep_to_dc_latency"][endpoint]
+    for video in data["video_ed_request"]:
+        for endpoint in data["video_ed_request"][video]:
 
-        # list of caches connected to an endpoint
-        connections = data["ed_cache_list"][endpoint]
-        # list of latencies of caches with video
-        caches = [dc_latency,]
+            num_of_requests = data["video_ed_request"][video][endpoint][0]
+            dc_latency = data["ep_to_dc_latency"][endpoint]
 
-        # find lowest latency cache with video.
-        # if ep and cache have no connection, nothing happens
-        for cache in connections:
-            if solution[cache][video] == 1:
-                caches.append(data["ep_to_cache_latency"][endpoint][cache])
+            # list of caches connected to an endpoint
+            connections = data["ed_cache_list"][endpoint]
+            # list of latencies of caches with video
+            caches = [dc_latency,]
 
-        time_saved += ((dc_latency - min(caches)) * num_of_requests)
-        total_requests += num_of_requests
+            # find lowest latency cache with video.
+            # if ep and cache have no connection, nothing happens
+            for cache in connections:
+                if solution[cache][video] == 1:
+                    caches.append(data["ep_to_cache_latency"][endpoint][cache])
+
+            # check whether the smallest latency among the connected caches is smaller than the currently stored smallest latency
+            # if it is, the currently stored smallest latency is updated
+            smallest_lat = data["video_ed_request"][video][endpoint][1]
+            min_cache = min(caches)
+            if min_cache < smallest_lat:
+                data["video_ed_request"][video][endpoint][1] = min_cache
+
+            time_saved += ((dc_latency - min_cache) * num_of_requests)
+            total_requests += num_of_requests
 
 
     return (time_saved * 1000) // total_requests
@@ -113,14 +120,13 @@ def hill_climb(solution, contents, data):"""
                 record change
                 change score
     """
-    highest = 0
 
 
 
 
 if __name__=="__main__":
 
-    data = read_google("input/example.in")
+    data = read_google("input/me_at_the_zoo.in")
 
 
     # sample solution given in hashcode brief - works for example.in
@@ -129,6 +135,6 @@ if __name__=="__main__":
                 [1, 1, 0, 0, 0]]
 
     newsol, newsol_contents = generate_solution(data)
-    print(newsol)
-    print(check_validity(newsol, data))
-    print(score_change(solution, 4, None, data))
+    print(score(newsol, data))
+
+

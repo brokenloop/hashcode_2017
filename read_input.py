@@ -17,6 +17,8 @@ def read_google(filename):
         video_size_desc = next(fin).strip().split(" ")
         for i in range(len(video_size_desc)):
             video_size_desc[i] = int(video_size_desc[i])
+        for i in range(number_of_videos):
+            video_ed_request[i] = {}
         ed_cache_list = []
 
         ### CACHE SECTION
@@ -52,7 +54,15 @@ def read_google(filename):
         ### REQUEST SECTION
         for i in range(number_of_requests):
             video_id, ed_id, requests = next(fin).strip().split(" ")
-            video_ed_request[(video_id,ed_id)] = requests
+            video_id, ed_id, requests = int(video_id), int(ed_id), int(requests)
+            # video_ed_request[(video_id,ed_id)] = requests
+            video_ed_request[video_id][ed_id] = [requests, ep_to_dc_latency[ed_id]]
+
+        mysize = len(video_ed_request)
+        for i in range(mysize):
+            if not video_ed_request[i]:
+                del video_ed_request[i]
+
 
 
     data["number_of_videos"] = number_of_videos
@@ -64,13 +74,13 @@ def read_google(filename):
     data["ep_to_dc_latency"] = ep_to_dc_latency
     data["ep_to_cache_latency"] = ep_to_cache_latency # faulty - will list latencies for ep/caches that aren't connected
     data["ed_cache_list"] = ed_cache_list # lists the caches that each endpoint is connected to
-    data["video_ed_request"] = video_ed_request
+    data["video_ed_request"] = video_ed_request # format is as follows: video {endpoint: [requests, min_latency]}
 
     return data
 
 
 if __name__=="__main__":
-    data = read_google("input/example.in")
+    data = read_google("input/kittens.in")
     # print(data["number_of_requests"])
     # sum = 0
     # for i in data["video_ed_request"]:
@@ -79,6 +89,3 @@ if __name__=="__main__":
     print("Number of caches:", data["number_of_caches"])
     print("Number of endpoints:", data["number_of_endpoints"])
 
-    key = ('4', '0')
-
-    pprint(data["video_ed_request"][key])
