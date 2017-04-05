@@ -81,7 +81,7 @@ def update_min_latency(video, cache, data):
                 data["video_ed_request"][video][endpoint][1] = cache_lat
 
 
-def generate_solution(data):
+def generate_random(data):
     grid = []
     cache_contents = {}
     capacity = data["cache_size"]
@@ -153,6 +153,13 @@ def hill_climb(sol, cache_contents, data):
                         best_score = newscore
                         best_move = [i, j]
                         move_found = True
+                    # elif newscore == best_score and newscore > 0:
+                    #     print("test")
+                    #     rand = random.randint(0, 1)
+                    #     if rand:
+                    #         best_score = newscore
+                    #         best_move = [i, j]
+                    # #         # move_found = True
 
         if move_found:
             print("Best move is", best_move, "with score:", best_score)
@@ -170,7 +177,7 @@ def hill_climb(sol, cache_contents, data):
 
 if __name__=="__main__":
 
-    data = read_google("input/videos_worth_spreading.in")
+    data = read_google("input/.in")
     # me_at_the_zoo = 516740
 
 
@@ -179,11 +186,13 @@ if __name__=="__main__":
                 [0, 1, 0, 1, 0],
                 [1, 1, 0, 0, 0]]
 
-    print("test")
-    newsol, newsol_contents = generate_solution(data)
+    # newsol, newsol_contents = generate_empty(data)
+    newsol, newsol_contents = generate_empty(data)
+
+
     print("original score:", score(newsol, data))
-    # hill_climb(newsol, newsol_contents, data)
-    # print("final score:", score(newsol, data))
+    hill_climb(newsol, newsol_contents, data)
+    print("final score:", score(newsol, data))
 
 
 
