@@ -55,7 +55,6 @@ def read_google(filename):
         for i in range(number_of_requests):
             video_id, ed_id, requests = next(fin).strip().split(" ")
             video_id, ed_id, requests = int(video_id), int(ed_id), int(requests)
-            # video_ed_request[(video_id,ed_id)] = requests
             video_ed_request[video_id][ed_id] = [requests, ep_to_dc_latency[ed_id]]
 
         mysize = len(video_ed_request)
